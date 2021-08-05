@@ -1,7 +1,7 @@
-import {Auth} from 'aws-amplify';
+import { Auth } from 'aws-amplify';
 import AsyncStorage from '@react-native-community/async-storage';
 import createDataContext from './createDataContext';
-import {showAlert, showLoading, hideLoading} from '../services/operators';
+import { showAlert, showLoading, hideLoading } from '../services/operators';
 import NavigationService from '../navigation/NavigationService';
 
 const authReducer = (state, action) => {
@@ -37,16 +37,16 @@ export const dispatch = (dispatch) => {
 };
 
 export const signIn = (dispatch) => {
-  return async ({username, password}) => {
+  return async ({ username, password }) => {
     showLoading('Logging in...');
     Auth.signIn(username, password)
       .then((user) => {
         // get Cognito tokens from current session
         const session = user.signInUserSession;
-        const {idToken, refreshToken} = session;
-        dispatch({type: 'saveJWTToken', payload: idToken.jwtToken});
-        dispatch({type: 'saveRefreshToken', payload: refreshToken.token});
-        dispatch({type: 'saveUser', payload: user.attributes});
+        const { idToken, refreshToken } = session;
+        dispatch({ type: 'saveJWTToken', payload: idToken.jwtToken });
+        dispatch({ type: 'saveRefreshToken', payload: refreshToken.token });
+        dispatch({ type: 'saveUser', payload: user.attributes });
         AsyncStorage.setItem('token', idToken.jwtToken);
         AsyncStorage.setItem('user', JSON.stringify(user.attributes));
         hideLoading();
@@ -56,7 +56,7 @@ export const signIn = (dispatch) => {
         );
       })
       .catch((err) => {
-        console.log({err});
+        console.log({ err });
         hideLoading();
         if (err.code === 'UserNotConfirmedException') {
           NavigationService.navigate('VerifyEmail', {
@@ -71,7 +71,7 @@ export const signIn = (dispatch) => {
 };
 
 const signUp = (dispatch) => {
-  return async ({username, password, barber, fullName}) => {
+  return async ({ username, password, barber, fullName }) => {
     showLoading('Registering...');
     Auth.signUp({
       username,
@@ -100,13 +100,13 @@ const signUp = (dispatch) => {
 };
 
 const verifyEmail = (dispatch) => {
-  return async ({email, password, code}) => {
+  return async ({ email, password, code }) => {
     showLoading('Verifying...');
     Auth.confirmSignUp(email, code)
       .then((res) => {
         // res: SUCCESS
         hideLoading();
-        signIn(dispatch)({username: email, password});
+        signIn(dispatch)({ username: email, password });
       })
       .catch((err) => {
         hideLoading();
@@ -137,7 +137,7 @@ const initialState = {
   user: {},
 };
 
-export const {Provider, Context} = createDataContext(
+export const { Provider, Context } = createDataContext(
   authReducer,
   {
     signIn,
